@@ -1,0 +1,11 @@
+numpy
+pandas
+scipy
+wfdb
+git+https://github.com/laszukdawid/PyEMD.git
+git+https://github.com/manu-mannattil/nolitsa.git
+git+https://github.com/raphaelvallat/entropy.git
+git+https://github.com/blue-yonder/tsfresh.git
+smote_variants
+PyWavelets
+neurokit
