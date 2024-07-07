@@ -1,4 +1,5 @@
-from smote_variants import SMOTE, OversamplingClassifier
+from smote_variants import SMOTE
+from smote_variants.classifiers import OversamplingClassifier
 
 from sklearn.svm import SVC
 from sklearn.model_selection import StratifiedKFold, GridSearchCV
