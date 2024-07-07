@@ -1,4 +1,5 @@
-from smote_variants import ADASYN, OversamplingClassifier
+from smote_variants import ADASYN
+from smote_variants.classifiers import OversamplingClassifier
 
 from sklearn.svm import SVC
 from sklearn.model_selection import StratifiedKFold, GridSearchCV
@@ -26,8 +27,10 @@ class KhanStudy(ClassifierMixin):
         base_classifier= SVC(kernel='rbf', probability=True, random_state=self.random_state)
         grid_search_params= {'C': [10**i for i in range(-4, 5)]}
 
-        classifier= base_classifier if not self.grid else GridSearchCV(base_classifier, grid_search_params, scoring='accuracy')
-        classifier= OversamplingClassifier(ADASYN(random_state=self.random_state), classifier)
+        oversampler = ('smote_variants', 'ADASYN', {'random_state':self.random_state})
+        classifier = ('sklearn.svm', 'SVC', {'kernel':'rbf', 'probability':True, 'random_state':self.random_state})
+        classifier= classifier if not self.grid else ('sklearn.model_selection', 'GridSearchCV', {'estimator':base_classifier, 'param_grid':grid_search_params, 'scoring':'accuracy'})
+        classifier= OversamplingClassifier(oversampler, classifier)
         self.pipeline= classifier if not self.preprocessing else Pipeline([('preprocessing', self.preprocessing), ('classifier', classifier)])
         self.pipeline.fit(X, y)
 
@@ -74,8 +77,10 @@ def study_khan(features, target, preprocessing=StandardScaler(), grid=True, rand
     print('without oversampling: ', results['without_oversampling_auc'])
 
     # with correct oversampling
-    classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='accuracy')
-    classifier= OversamplingClassifier(ADASYN(random_state=random_seed), classifier)
+    oversampler = ('smote_variants', 'ADASYN', {'random_state':random_seed})
+    classifier = ('sklearn.svm', 'SVC', {'kernel':'rbf', 'probability':True, 'random_state':random_seed})
+    classifier= classifier if not grid else ('sklearn.model_selection', 'GridSearchCV', {'estimator':base_classifier, 'param_grid':grid_search_params, 'scoring':'accuracy'})
+    classifier= OversamplingClassifier(oversampler, classifier)
     pipeline= classifier if not preprocessing else Pipeline([('preprocessing', preprocessing), ('classifier', classifier)])
     validator= StratifiedKFold(n_splits=5, random_state= random_seed)
 

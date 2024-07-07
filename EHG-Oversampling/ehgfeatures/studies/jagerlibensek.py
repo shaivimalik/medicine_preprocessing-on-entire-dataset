@@ -1,4 +1,5 @@
-from smote_variants import ADASYN, OversamplingClassifier, SMOTE
+from smote_variants import ADASYN
+from smote_variants.classifiers import OversamplingClassifier
 
 from sklearn.svm import SVC
 from sklearn.model_selection import StratifiedKFold, GridSearchCV
@@ -27,8 +28,10 @@ class JagerLibensekStudy(ClassifierMixin):
         base_classifier= QuadraticDiscriminantAnalysis()
         grid_search_params= {'reg_param': [0.01, 0.1, 0.5, 0.9, 0.99]}
 
-        classifier= base_classifier if not self.grid else GridSearchCV(base_classifier, grid_search_params, scoring='roc_auc')
-        classifier= OversamplingClassifier(ADASYN(), classifier)
+        oversampler = ('smote_variants', 'ADASYN', {})
+        classifier = ('sklearn.discriminant_analysis', 'QuadraticDiscriminantAnalysis', {})
+        classifier= classifier if not self.grid else ('sklearn.model_selection', 'GridSearchCV', {'estimator':base_classifier, 'param_grid':grid_search_params, 'scoring':'roc_auc'})
+        classifier= OversamplingClassifier(oversampler, classifier)
         self.pipeline= classifier if not self.preprocessing else Pipeline([('preprocessing', self.preprocessing), ('classifier', classifier)])
         self.pipeline.fit(X, y)
 
@@ -73,8 +76,10 @@ def study_jagerlibensek(features, target, preprocessing=StandardScaler(), grid=T
     print('without oversampling: ', results['without_oversampling_auc'])
 
     # with correct oversampling
-    classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='roc_auc')
-    classifier= OversamplingClassifier(ADASYN(), classifier)
+    oversampler = ('smote_variants', 'ADASYN', {})
+    classifier = ('sklearn.discriminant_analysis', 'QuadraticDiscriminantAnalysis', {})
+    classifier= classifier if not grid else ('sklearn.model_selection', 'GridSearchCV', {'estimator':base_classifier, 'param_grid':grid_search_params, 'scoring':'roc_auc'})
+    classifier= OversamplingClassifier(oversampler, classifier)
     pipeline= classifier if not preprocessing else Pipeline([('preprocessing', preprocessing), ('classifier', classifier)])
     validator= StratifiedKFold(n_splits=10, random_state= random_seed)
 

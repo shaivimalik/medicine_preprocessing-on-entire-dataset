@@ -3,7 +3,7 @@ import scipy.stats
 
 import PyEMD
 import pywt
-import neurokit
+import neurokit2 as nk
 import entropy
 
 __all__= ['EMDDecomposition', 'WPDDecomposition']

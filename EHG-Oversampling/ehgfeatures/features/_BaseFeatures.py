@@ -3,8 +3,8 @@ import scipy.stats
 
 import PyEMD
 import pywt
-import neurokit
-import entropy
+import neurokit2 as nk
+import antropy
 
 import logging
 
@@ -98,21 +98,8 @@ class FeatureFractalDimensionHigushi(FeatureBase):
 
     def extract(self, signal):
         logging.info("extracting %s" % self.__class__.__name__)
-        return {self.__class__.__name__: neurokit.complexity(signal, 
-                        shannon=False, 
-                        sampen=False, 
-                        multiscale=False, 
-                        spectral=False, 
-                        svd=False, 
-                        correlation=False, 
-                        higushi=True, 
-                        petrosian=False, 
-                        fisher=False, 
-                        hurst=False, 
-                        dfa=False, 
-                        lyap_r=False, 
-                        lyap_e=False, 
-                        emb_dim=2)['Fractal_Dimension_Higushi']}
+        hfd, *_ = nk.fractal_higuchi(signal, k_max=8, show=False)
+        return {self.__class__.__name__: hfd}
 
 class FeatureInterquartileRange(FeatureBase):
     def n_features(self):
@@ -154,7 +141,7 @@ class FeatureSampleEntropy(FeatureBase):
 
     def extract(self, signal):
         logging.info("extracting %s" % self.__class__.__name__)
-        return {self.__class__.__name__: entropy.sample_entropy(signal, order=2, metric="chebyshev")}
+        return {self.__class__.__name__: antropy.sample_entropy(signal, order=2, metric="chebyshev")}
 
 class FeatureStandardDeviation(FeatureBase):
     def n_features(self):
@@ -348,7 +335,7 @@ def dfa(x, scale_lim=[5,9], scale_dens=0.25, show=False):
     """
     # cumulative sum of data with substracted offset
     y = np.cumsum(x - np.mean(x))
-    scales = (2**np.arange(scale_lim[0], scale_lim[1], scale_dens)).astype(np.int)
+    scales = (2**np.arange(scale_lim[0], scale_lim[1], scale_dens)).astype(np.int32)
     fluct = np.zeros(len(scales))
     # computing RMS for each window
     for e, sc in enumerate(scales):

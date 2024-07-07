@@ -14,7 +14,7 @@ class FeaturesAhmed(FeatureBase):
         """Utility function for `app_entropy`` and `sample_entropy`.
         FROM: https://github.com/raphaelvallat/entropy/blob/master/entropy/entropy.py
         """
-        _all_metrics = KDTree.valid_metrics
+        _all_metrics = KDTree.valid_metrics()
         if metric not in _all_metrics:
             raise ValueError('The given metric (%s) is not valid. The valid '
                              'metric names are: %s' % (metric, _all_metrics))

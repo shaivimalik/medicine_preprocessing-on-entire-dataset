@@ -34,9 +34,11 @@ class FergusStudy(ClassifierMixin):
         grid_search_params= {'hidden_layer_sizes': [(100,), (50,), (200)],
                                 'activation': ['logistic', 'tanh', 'relu'],
                                 'alpha': [0.0001, 0.001, 0.01, 0.1]}
-
-        classifier= base_classifier if not self.grid else GridSearchCV(base_classifier, grid_search_params, scoring='roc_auc')
-        classifier= OversamplingClassifier(SMOTE(), classifier)
+        
+        oversampler = ('smote_variants', 'SMOTE', {})
+        classifier = ('sklearn.neural_network', 'MLPClassifier', {})
+        classifier= classifier if not self.grid else ('sklearn.model_selection', 'GridSearchCV', {'estimator':base_classifier, 'param_grid':grid_search_params, 'scoring':'roc_auc'})
+        classifier= OversamplingClassifier(oversampler, classifier)
         self.pipeline= classifier if not self.preprocessing else Pipeline([('preprocessing', self.preprocessing), ('classifier', classifier)])
         self.pipeline.fit(X, y)
 
@@ -139,8 +141,10 @@ def study_fergus(features, target, preprocessing=StandardScaler(), grid=True, ra
 
     # with correct oversampling
     #base_classifier= RadialBasisNeuralNetworkClassifier()
-    classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='roc_auc')
-    classifier= OversamplingClassifier(SMOTE(), classifier)
+    oversampler = ('smote_variants', 'SMOTE', {})
+    classifier = ('sklearn.neural_network', 'MLPClassifier', {})
+    classifier= classifier if not grid else ('sklearn.model_selection', 'GridSearchCV', {'estimator':base_classifier, 'param_grid':grid_search_params, 'scoring':'roc_auc'})
+    classifier= OversamplingClassifier(oversampler, classifier)
     pipeline= classifier if not preprocessing else Pipeline([('preprocessing', preprocessing), ('classifier', classifier)])
     validator= StratifiedKFold(n_splits=10, random_state= random_seed)
 

@@ -57,9 +57,9 @@ def get_signals(directory, n_signals= -1):
             print("faulty signal length: %d" % len(signal_ch1))
             continue
 
-        signals.append([signal_ch1, signal_ch2, signal_ch3])
+        signals.append([np.array(signal_ch1), np.array(signal_ch2), np.array(signal_ch3)])
         all_clin_names.append(clin_names)
         all_clin_values.append(clin_values)
         ids.append(file_id)
 
-    return np.array(ids), np.array(signals), all_clin_names, all_clin_values
+    return np.array(ids), signals, all_clin_names, all_clin_values

@@ -26,8 +26,10 @@ class Fergus2013Study(ClassifierMixin):
         base_classifier= SVC(random_state=self.random_state, probability=True)
         grid_search_params= {'C': [10**i for i in range(-4, 5)]}
 
-        classifier= base_classifier if not self.grid else GridSearchCV(base_classifier, grid_search_params, scoring='roc_auc')
-        classifier= OversamplingClassifier(SMOTE(random_state=self.random_state), classifier)
+        oversampler = ('smote_variants', 'SMOTE', {'random_state':self.random_state})
+        classifier = ('sklearn.svm', 'SVC', {'probability':True, 'random_state':self.random_state})
+        classifier= classifier if not self.grid else ('sklearn.model_selection', 'GridSearchCV', {'estimator':base_classifier, 'param_grid':grid_search_params, 'scoring':'roc_auc'})
+        classifier= OversamplingClassifier(oversampler, classifier)
         self.pipeline= classifier if not self.preprocessing else Pipeline([('preprocessing', self.preprocessing), ('classifier', classifier)])
         self.pipeline.fit(X, y)
 
@@ -74,8 +76,10 @@ def study_fergus_2013(features, target, preprocessing=StandardScaler(), grid=Tru
     print('without oversampling: ', results['without_oversampling_auc'])
 
     # with correct oversampling
-    classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='roc_auc')
-    classifier= OversamplingClassifier(SMOTE(random_state=random_seed), classifier)
+    oversampler = ('smote_variants', 'SMOTE', {'random_state':random_seed})
+    classifier = ('sklearn.svm', 'SVC', {'probability':True, 'random_state':random_seed})
+    classifier= classifier if not grid else ('sklearn.model_selection', 'GridSearchCV', {'estimator':base_classifier, 'param_grid':grid_search_params, 'scoring':'roc_auc'})
+    classifier= OversamplingClassifier(oversampler, classifier)
     pipeline= classifier if not preprocessing else Pipeline([('preprocessing', preprocessing), ('classifier', classifier)])
     validator= StratifiedKFold(n_splits=5, random_state= random_seed)
 

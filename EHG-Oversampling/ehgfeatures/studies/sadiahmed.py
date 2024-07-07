@@ -1,4 +1,5 @@
-from smote_variants import ADASYN, OversamplingClassifier
+from smote_variants import ADASYN
+from smote_variants.classifiers import OversamplingClassifier
 
 from sklearn.svm import SVC
 from sklearn.model_selection import StratifiedKFold, GridSearchCV
@@ -49,8 +50,10 @@ class SadiAhmedStudy(ClassifierMixin):
         base_classifier= SVC(kernel='linear', random_state=self.random_state, probability=True)
         grid_search_params= {'kernel': ['linear'], 'C': [10**i for i in range(-4, 5)], 'probability': [True], 'random_state': [self.random_state]}
 
-        classifier= base_classifier if not self.grid else GridSearchCV(base_classifier, grid_search_params, scoring='roc_auc')
-        classifier= OversamplingClassifier(ADASYN(), classifier)
+        oversampler = ('smote_variants', 'ADASYN', {})
+        classifier = ('sklearn.svm', 'SVC', {'kernel':'linear', 'probability':True, 'random_state':self.random_state})
+        classifier= classifier if not self.grid else ('sklearn.model_selection', 'GridSearchCV', {'estimator':base_classifier, 'param_grid':grid_search_params, 'scoring':'roc_auc'})
+        classifier= OversamplingClassifier(oversampler, classifier)
         self.pipeline= classifier if not self.preprocessing else Pipeline([('preprocessing', self.preprocessing), ('classifier', classifier)])
         self.pipeline.fit(X, y)
 
@@ -115,8 +118,10 @@ def study_sadiahmed(features, target, preprocessing=StandardScaler(), grid=True,
     print('without oversampling: ', results['without_oversampling_auc'])
 
     # with correct oversampling
-    classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='roc_auc')
-    classifier= OversamplingClassifier(ADASYN(), classifier)
+    oversampler = ('smote_variants', 'ADASYN', {})
+    classifier = ('sklearn.svm', 'SVC', {'kernel':'linear', 'probability':True, 'random_state':random_seed})
+    classifier= classifier if not grid else ('sklearn.model_selection', 'GridSearchCV', {'estimator':base_classifier, 'param_grid':grid_search_params, 'scoring':'roc_auc'})
+    classifier= OversamplingClassifier(oversampler, classifier)
     pipeline= classifier if not preprocessing else Pipeline([('preprocessing', preprocessing), ('classifier', classifier)])
     validator= StratifiedKFold(n_splits=10, random_state= random_seed)
 

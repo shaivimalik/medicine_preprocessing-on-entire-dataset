@@ -3,8 +3,7 @@ import scipy.stats
 
 import PyEMD
 import pywt
-import neurokit
-import entropy
+import neurokit2 as nk
 
 import logging
 

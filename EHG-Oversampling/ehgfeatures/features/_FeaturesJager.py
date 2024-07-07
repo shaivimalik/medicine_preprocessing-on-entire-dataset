@@ -4,7 +4,7 @@ import statsmodels.api as sm
 from nolitsa.lyapunov import mle_embed
 from nolitsa.d2 import c2_embed, d2
 from sklearn.neighbors import KDTree
-from entropy.utils import _embed
+from antropy.utils import _embed
 
 from ehgfeatures.features import FeatureBase
 
@@ -40,7 +40,7 @@ class FeaturesJager(FeatureBase):
 	    """Utility function for `app_entropy`` and `sample_entropy`.
 	    FROM: https://github.com/raphaelvallat/entropy/blob/master/entropy/entropy.py
 	    """
-	    _all_metrics = KDTree.valid_metrics
+	    _all_metrics = KDTree.valid_metrics()
 	    if metric not in _all_metrics:
 	        raise ValueError('The given metric (%s) is not valid. The valid '
 	                         'metric names are: %s' % (metric, _all_metrics))

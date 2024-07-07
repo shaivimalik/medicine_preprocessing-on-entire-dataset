@@ -1,5 +1,5 @@
-from smote_variants import ADASYN, OversamplingClassifier
-
+from smote_variants import ADASYN
+from smote_variants.classifiers import OversamplingClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import StratifiedKFold, GridSearchCV
 from sklearn.pipeline import Pipeline
@@ -26,8 +26,10 @@ class PengStudy(ClassifierMixin):
         base_classifier= RandomForestClassifier(random_state=self.random_state)
         grid_search_params= {'max_depth': [3, 5, 10, None], 'min_samples_leaf': [1, 3, 5]}
 
-        classifier= base_classifier if not self.grid else GridSearchCV(base_classifier, grid_search_params, scoring='roc_auc')
-        classifier= OversamplingClassifier(ADASYN(random_state=self.random_state), classifier)
+        oversampler = ('smote_variants', 'ADASYN', {'random_state':self.random_state})
+        classifier = ('sklearn.ensemble', 'RandomForestClassifier', {'random_state':self.random_state})
+        classifier= classifier if not self.grid else ('sklearn.model_selection', 'GridSearchCV', {'estimator':base_classifier, 'param_grid':grid_search_params, 'scoring':'roc_auc'})
+        classifier= OversamplingClassifier(oversampler, classifier)
         self.pipeline= classifier if not self.preprocessing else Pipeline([('preprocessing', self.preprocessing), ('classifier', classifier)])
         self.pipeline.fit(X, y)
 
@@ -80,8 +82,10 @@ def study_peng(features, target, preprocessing=StandardScaler(), grid=True, rand
     print('without oversampling: ', results['without_oversampling_auc'])
 
     # with correct oversampling
-    classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='roc_auc')
-    classifier= OversamplingClassifier(ADASYN(random_state=random_seed), classifier)
+    oversampler = ('smote_variants', 'ADASYN', {'random_state':random_seed})
+    classifier = ('sklearn.ensemble', 'RandomForestClassifier', {'random_state':random_seed})
+    classifier= classifier if not grid else ('sklearn.model_selection', 'GridSearchCV', {'estimator':base_classifier, 'param_grid':grid_search_params, 'scoring':'roc_auc'})
+    classifier= OversamplingClassifier(oversampler, classifier)
     pipeline= classifier if not preprocessing else Pipeline([('preprocessing', preprocessing), ('classifier', classifier)])
     validator= StratifiedKFold(n_splits=5, random_state= random_seed)
 
