@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.neighbors import KDTree
-from entropy.utils import _embed
+from antropy.utils import _embed
 
 from ehgfeatures.features import FeatureBase
 
