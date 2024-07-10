@@ -1,7 +1,7 @@
 import pandas as pd
 
 import sys
-sys.path.append('../ehgfeatures')
+sys.path.append('..')
 
 from ehgfeatures.studies.acharya import study_acharya
 from ehgfeatures.studies.hosseinzahde import study_hosseinzahde
@@ -19,8 +19,8 @@ from ehgfeatures.studies.jagerlibensek import study_jagerlibensek
 import warnings
 warnings.filterwarnings('ignore')
 
-features= pd.read_csv('output/raw_features.csv')
-target= pd.read_csv('output/target.csv', header=None, index_col=None)
+features= pd.read_csv('../output/raw_features.csv')
+target= pd.read_csv('../output/target.csv', header=None, index_col=None)
 
 X= features
 y= target.loc[:,0]

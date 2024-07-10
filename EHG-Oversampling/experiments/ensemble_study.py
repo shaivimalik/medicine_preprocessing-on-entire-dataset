@@ -1,7 +1,7 @@
 import pandas as pd
 
 import sys
-sys.path.append('../ehgfeatures')
+sys.path.append('..')
 
 from ehgfeatures.studies.acharya import AcharyaStudy
 from ehgfeatures.studies.hosseinzahde import HosseinZahdeStudy
@@ -22,8 +22,8 @@ from sklearn.preprocessing import LabelEncoder
 import warnings
 warnings.filterwarnings('ignore')
 
-features= pd.read_csv('output/raw_features.csv')
-target= pd.read_csv('output/target.csv', header=None, index_col=None)
+features= pd.read_csv('../output/raw_features.csv')
+target= pd.read_csv('../output/target.csv', header=None, index_col=None)
 
 X= features
 y= target.loc[:,0]
@@ -193,7 +193,7 @@ from sklearn.metrics import roc_auc_score
 for i in all_results:
     print("%s %f" % (i, roc_auc_score(all_tests, all_results[i])))
 
-ensemble= np.vstack(all_results.values()).T
+ensemble= np.vstack(list(all_results.values())).T
 
 ensemble= ensemble[:,[0, 6, 7]]
 

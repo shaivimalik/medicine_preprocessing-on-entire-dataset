@@ -1,4 +1,5 @@
-from smote_variants import SMOTE, OversamplingClassifier
+from smote_variants import ADASYN
+from smote_variants.classifiers import OversamplingClassifier
 
 from sklearn.svm import SVC
 from sklearn.model_selection import StratifiedKFold, GridSearchCV
@@ -9,7 +10,6 @@ from sklearn.preprocessing import StandardScaler
 import numpy as np
 import pandas as pd
 
-import pyswarms as ps
 from collections import Counter
 
 import json
@@ -78,7 +78,7 @@ def study_hussain(features, target, preprocessing=None, grid=True, random_seed=4
     # without oversampling
     classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='accuracy')
     pipeline= classifier if not preprocessing else Pipeline([('preprocessing', preprocessing), ('classifier', classifier)])
-    validator= StratifiedKFold(n_splits=5, random_state= random_seed)
+    validator= StratifiedKFold(n_splits=5, random_state= random_seed, shuffle=True)
 
     preds= evaluate(pipeline, features, target, validator)
     results['without_oversampling_auc']= accuracy_score(preds['label'].values, preds['prediction'].values > 0.5)
@@ -89,7 +89,7 @@ def study_hussain(features, target, preprocessing=None, grid=True, random_seed=4
     # with correct oversampling
     classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='accuracy')
     pipeline= classifier if not preprocessing else Pipeline([('preprocessing', preprocessing), ('classifier', classifier)])
-    validator= StratifiedKFold(n_splits=5, random_state= random_seed)
+    validator= StratifiedKFold(n_splits=5, random_state= random_seed, shuffle=True)
 
     preds= np.zeros((len(features), 3))
     for fold_idx, (train_idx, test_idx) in enumerate(validator.split(features, target)):
@@ -137,7 +137,7 @@ def study_hussain(features, target, preprocessing=None, grid=True, random_seed=4
     X, y = features, target
     classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='accuracy')
     pipeline= classifier if not preprocessing else Pipeline([('preprocessing', preprocessing), ('classifier', classifier)])
-    validator= StratifiedKFold(n_splits=5, random_state=random_seed)
+    validator= StratifiedKFold(n_splits=5, random_state=random_seed, shuffle=True)
 
     majority_class = Counter(target).most_common(1)[0][0]
     X_majority = X.loc[target == majority_class, :]

@@ -10,8 +10,6 @@ from sklearn.preprocessing import StandardScaler
 import numpy as np
 import pandas as pd
 
-import pyswarms as ps
-
 import json
 # acharya_features= ['FeaturesAcharya_aaaaa_emd_1_FeatureMeanAbsoluteDeviation_ch3',
 #                    'FeaturesAcharya_aaad_emd_10_FeatureSampleEntropy_ch3',
@@ -79,7 +77,7 @@ def study_acharya(features, target, preprocessing=StandardScaler(), grid=True, r
     # without oversampling
     classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='accuracy')
     pipeline= classifier if not preprocessing else Pipeline([('preprocessing', preprocessing), ('classifier', classifier)])
-    validator= StratifiedKFold(n_splits=10, random_state= random_seed)
+    validator= StratifiedKFold(n_splits=10, random_state= random_seed, shuffle=True)
 
     preds= evaluate(pipeline, features, target, validator)
     results['without_oversampling_acc']= accuracy_score(preds['label'].values, preds['prediction'].values > 0.5)
@@ -95,7 +93,7 @@ def study_acharya(features, target, preprocessing=StandardScaler(), grid=True, r
     classifier= OversamplingClassifier(oversampler, classifier)
     pipeline= classifier if not preprocessing else Pipeline([('preprocessing', preprocessing), ('classifier', classifier)])
     correct_pipeline= pipeline
-    validator= StratifiedKFold(n_splits=10, random_state= random_seed)
+    validator= StratifiedKFold(n_splits=10, random_state= random_seed, shuffle=True)
 
     preds= evaluate(classifier, features, target, validator)
     results['with_oversampling_acc']= accuracy_score(preds['label'].values, preds['prediction'].values > 0.5)
@@ -110,7 +108,7 @@ def study_acharya(features, target, preprocessing=StandardScaler(), grid=True, r
 
     classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='accuracy')
     pipeline= classifier if not preprocessing else Pipeline([('preprocessing', preprocessing), ('classifier', classifier)])
-    validator= StratifiedKFold(n_splits=10, random_state= random_seed)
+    validator= StratifiedKFold(n_splits=10, random_state= random_seed, shuffle=True)
 
     preds= evaluate(pipeline, X, y, validator)
     results['incorrect_oversampling_acc']= accuracy_score(preds['label'].values, preds['prediction'].values > 0.5)

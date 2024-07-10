@@ -10,8 +10,6 @@ from sklearn.preprocessing import StandardScaler
 import numpy as np
 import pandas as pd
 
-import pyswarms as ps
-
 import json
 
 from collections import Counter
@@ -109,7 +107,7 @@ def study_sadiahmed(features, target, preprocessing=StandardScaler(), grid=True,
     # without oversampling
     classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='roc_auc')
     pipeline= classifier if not preprocessing else Pipeline([('preprocessing', preprocessing), ('classifier', classifier)])
-    validator= StratifiedKFold(n_splits=10, random_state= random_seed)
+    validator= StratifiedKFold(n_splits=10, random_state= random_seed, shuffle=True)
 
     preds= evaluate(pipeline, features, target, validator)
     results['without_oversampling_auc']= roc_auc_score(preds['label'].values, preds['prediction'].values)
@@ -123,7 +121,7 @@ def study_sadiahmed(features, target, preprocessing=StandardScaler(), grid=True,
     classifier= classifier if not grid else ('sklearn.model_selection', 'GridSearchCV', {'estimator':base_classifier, 'param_grid':grid_search_params, 'scoring':'roc_auc'})
     classifier= OversamplingClassifier(oversampler, classifier)
     pipeline= classifier if not preprocessing else Pipeline([('preprocessing', preprocessing), ('classifier', classifier)])
-    validator= StratifiedKFold(n_splits=10, random_state= random_seed)
+    validator= StratifiedKFold(n_splits=10, random_state= random_seed, shuffle=True)
 
     preds= evaluate(classifier, features, target, validator)
     results['with_oversampling_auc']= roc_auc_score(preds['label'].values, preds['prediction'].values)
@@ -145,7 +143,7 @@ def study_sadiahmed(features, target, preprocessing=StandardScaler(), grid=True,
 
     classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='roc_auc')
     pipeline= classifier if not preprocessing else Pipeline([('preprocessing', preprocessing), ('classifier', classifier)])
-    validator= StratifiedKFold(n_splits=10, random_state= random_seed)
+    validator= StratifiedKFold(n_splits=10, random_state= random_seed, shuffle=True)
 
     preds= evaluate(pipeline, X, y, validator)
     results['incorrect_oversampling_auc']= roc_auc_score(preds['label'].values, preds['prediction'].values)
