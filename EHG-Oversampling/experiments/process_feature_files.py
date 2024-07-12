@@ -17,7 +17,14 @@ from sklearn.preprocessing import StandardScaler
 
 import warnings; warnings.filterwarnings('ignore')
 
-PATH='output_jl'
+import argparse
+
+parser = argparse.ArgumentParser(description='file directories')
+parser.add_argument("to_retrieve", help="path to directory of individual csv files")
+parser.add_argument("to_store", help="path to directory to write csv files")
+
+args = parser.parse_args()
+PATH=args.to_retrieve
 
 # Util classes & functions for feature selection
 class PipelineRFE(Pipeline):
@@ -176,7 +183,7 @@ feature_matrix = joined_features.drop(['TimeToBirth_ch3', 'TimeToBirth_ch2', 'Ti
                                        'RecID', 'channel'], axis=1) # , 'id'
 
 X= feature_matrix.reset_index(drop=True)
-y= feature_matrix['Rectime'] + ttb >= 37
+y= (feature_matrix['Rectime'] + ttb >= 37).astype('float')
 
 #features = ["id"]
 #for col in ["FeaturesJager_ac_zero","FeaturesJager_max_lyap","FeaturesJager_corr_dim"]:
@@ -184,16 +191,16 @@ y= feature_matrix['Rectime'] + ttb >= 37
 
 #X = X[features]
 
-X.to_csv(os.path.join(PATH, 'raw_features_jl.csv'))
-y.to_csv(os.path.join(PATH, 'target_jl.csv'), index=False)
+X.to_csv(os.path.join(args.to_store, 'raw_features.csv'))
+y.to_csv(os.path.join(args.to_store, 'target.csv'), index=False)
 
 # Apply first feature selection by removing highly correlated features
-useless_features = remove_features(feature_matrix)
-feature_matrix = feature_matrix.drop(useless_features, axis=1)
+#useless_features = remove_features(feature_matrix)
+#feature_matrix = feature_matrix.drop(useless_features, axis=1)
 
 # Create our X and our y (term/preterm)
-X = feature_matrix.reset_index(drop=True)
+#X = feature_matrix.reset_index(drop=True)
 #y = feature_matrix['Rectime'] + ttb >= 37
 
-X.to_csv(os.path.join(PATH, 'cleaned_features_jl.csv'))
+#X.to_csv(os.path.join(PATH, 'cleaned_features_jl.csv'))
 #y.to_csv(os.path.join(PATH, 'target.csv'), index=False)
