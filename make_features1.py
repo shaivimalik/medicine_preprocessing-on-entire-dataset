@@ -1,3 +1,8 @@
+'''
+This code is a modified version of the code available at:
+https://github.com/GillesVandewiele/EHG-Oversampling/blob/dcde9e5b25800ff6b251e0a6f4c3b252148aa398/experiments/all_features.py
+'''
+
 import warnings
 warnings.filterwarnings('ignore')
 
