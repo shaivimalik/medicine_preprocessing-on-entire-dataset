@@ -71,7 +71,7 @@ khan_features = [
 ]
 X= X[[c for c in X.columns if c in khan_features or ('FeaturesAcharya' in c and 'SampleEntropy' in c)]]
 y= feature_matrix['Rectime'] + ttb >= 37
-
+y= y.astype('float')
 
 X.to_csv('raw_features.csv')
 y.to_csv('target.csv', index=False)
