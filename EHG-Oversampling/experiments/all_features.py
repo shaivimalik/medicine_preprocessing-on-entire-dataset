@@ -2,7 +2,8 @@ import warnings
 warnings.filterwarnings('ignore')
 import os
 import sys
-#sys.path.append() add path to ehg-oversampling
+sys.path.append('EHG-Oversampling') #add path to ehg-oversampling
+
 from ehgfeatures.features import FeaturesAllEHG, FeatureGroup, FeaturesAcharya, FeaturesJager, FeaturesSubramaniam, FeaturesJanjarasjitt, FeaturesHosseinzahde, FeaturesSadiAhmed, FeaturesFergus, FeaturesTSFRESH, FeaturesAhmed, FeaturesRen, FeaturesJagerLibensek
 
 from ehgfeatures.signal_io import get_signals
@@ -22,7 +23,7 @@ N_JOBS= 6
 parser = argparse.ArgumentParser(description='file directories')
 parser.add_argument("to_data", help="Path to the 'tpehgdb' directory (within 'term-preterm-ehg-database-1.0.1')")
 parser.add_argument("to_store", help="Path to the directory where individual CSV files will be saved")
-parser.add_argument("study", help="Study for which features are required", default="FeaturesAllEHG")
+parser.add_argument("--study", help="Study for which features are required", default="FeaturesAllEHG")
 
 args = parser.parse_args()
 
