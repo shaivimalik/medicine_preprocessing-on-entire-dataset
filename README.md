@@ -33,7 +33,7 @@ This resource may be executed on Google Colab or on [Chameleon](https://chameleo
 This project was part of the 2024 Summer of Reproducibility organized by the [UC Santa Cruz Open Source Program Office](https://ucsc-ospo.github.io/).
 
 * Contributor: [Shaivi Malik](https://github.com/shaivimalik)
-* Mentors: [Fraida Fund](https://github.com/ffund), [Mohamed Saeed](https://github.com/mohammed183)ffund@ffund-XPS-13-9300:~/Projects/medicine_
+* Mentors: [Fraida Fund](https://github.com/ffund), [Mohamed Saeed](https://github.com/mohammed183)
 
 ### References
 
