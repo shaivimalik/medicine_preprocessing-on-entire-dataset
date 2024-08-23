@@ -2,7 +2,7 @@
 
 # Reproducing "Characterization of Term and Preterm Deliveries using Electrohysterograms Signatures"
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/shaivimalik/medicine_preprocessing-on-entire-dataset/blob/main/notebooks/01.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/shaivimalik/medicine_preprocessing-on-entire-dataset/blob/main/notebooks/Reproducing_Original_Result.ipynb)
 
 :::
 
