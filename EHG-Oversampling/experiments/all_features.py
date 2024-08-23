@@ -2,7 +2,8 @@ import warnings
 warnings.filterwarnings('ignore')
 import os
 import sys
-sys.path.append('EHG-Oversampling') #add path to ehg-oversampling
+sys.path.append('../EHG-Oversampling') #add path to ehg-oversampling
+#print(os.path.relpath('< >/medicine_preprocessing-on-entire-dataset/EHG-Oversampling'))
 
 from ehgfeatures.features import FeaturesAllEHG, FeatureGroup, FeaturesAcharya, FeaturesJager, FeaturesSubramaniam, FeaturesJanjarasjitt, FeaturesHosseinzahde, FeaturesSadiAhmed, FeaturesFergus, FeaturesTSFRESH, FeaturesAhmed, FeaturesRen, FeaturesJagerLibensek
 

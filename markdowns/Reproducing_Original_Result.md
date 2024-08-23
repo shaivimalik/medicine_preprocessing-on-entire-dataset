@@ -25,9 +25,10 @@ The main challenge in addressing preterm births is the delay in obtaining clinic
 
 ::: {.cell .code}
 ```python
-!git clone https://github.com/shaivimalik/medicine_preprocessing-on-entire-dataset.git
-%cd medicine_preprocessing-on-entire-dataset
-!pip install -r requirements.txt
+# Uncomment the following lines if running on Google Colab
+#!git clone https://github.com/shaivimalik/medicine_preprocessing-on-entire-dataset.git
+#!pip install -r requirements.txt
+#%cd medicine_preprocessing-on-entire-dataset/notebooks
 ```
 :::
 
@@ -60,8 +61,8 @@ Note that the download may take some time depending on your internet connection 
 
 ::: {.cell .code}
 ```python
-!curl -O https://physionet.org/static/published-projects/tpehgdb/term-preterm-ehg-database-1.0.1.zip
-!unzip term-preterm-ehg-database-1.0.1.zip
+!curl -o ../term-preterm-ehg-database-1.0.1.zip https://physionet.org/static/published-projects/tpehgdb/term-preterm-ehg-database-1.0.1.zip
+!unzip ../term-preterm-ehg-database-1.0.1.zip -d ../
 ```
 :::
 
@@ -70,7 +71,7 @@ Note that the download may take some time depending on your internet connection 
 
 **Characterization of Term and Preterm Deliveries using Electrohysterograms Signatures**[^1] presents a method for preterm birth prediction using classifiers trained on Electrohysterogram signatures. In this study, four features were extracted from EHG signatures: **Median frequency, Shannon energy, Log energy and Lyapunov exponent**. These features were used to distinguish between term and preterm births. 
 
-However, the TPEGH database presents a challenge: class imbalance. It contains a significantly higher number of term birth records (262) compared to preterm births (38). To address the class imbalance issue, the study employed the Adaptive Synthetic Sampling technique. This method generates synthetic samples for the minority class to create a more balanced dataset. 
+However, the TPEHG database presents a challenge: class imbalance. It contains a significantly higher number of term birth records (262) compared to preterm births (38). To address the class imbalance issue, the study employed the Adaptive Synthetic Sampling technique. This method generates synthetic samples for the minority class to create a more balanced dataset. 
 
 Using these features, various machine learning models were trained, including different types of Support Vector Machines (Linear, Quadratic, Cubic, Fine Gaussian, Medium Gaussian), Decision Trees, and K-Nearest Neighbor (Medium and Cubic) classifiers. 10-fold cross validation was used to to assess the performance of these models, reporting accuracy, sensitivity, specificity, and error scores for each.
 
@@ -118,10 +119,9 @@ Note that 2 EHG signals will be discarded due to their short recording lengths.
 
 ::: {.cell .code}
 ```python
-!mkdir individual_features
-!python3 EHG-Oversampling/experiments/all_features.py term-preterm-ehg-database-1.0.1/tpehgdb individual_features --study FeaturesKhan
-!python3 EHG-Oversampling/experiments/process_feature_files.py individual_features ./
-%cd notebooks
+!mkdir ../individual_features
+!python3 ../EHG-Oversampling/experiments/all_features.py ../term-preterm-ehg-database-1.0.1/tpehgdb ../individual_features --study FeaturesKhan
+!python3 ../EHG-Oversampling/experiments/process_feature_files.py ../individual_features ../
 ```
 :::
 
@@ -220,7 +220,7 @@ plt.show()
 
 ::: {.cell .markdown}
 
-This code cell plots the first 1000 samples from each of the three channels of a signal from the TPEGH database.
+This code cell plots the first 1000 samples from each of the three channels of a signal from the TPEHG database.
 
 :::
 
@@ -308,9 +308,9 @@ The TPEHG database exhibits a class imbalance, containing 38 preterm records and
 
 To prevent classifiers from developing biases towards the majority class, sampling techniques are used. These techniques aim to balance the representation of classes present in the dataset. They allow models to learn from a more balanced dataset and improve their generalizability for real-world prediction. 
 
-- **Oversampling**: The minority class is upsampled to match the count of majority class. 
+- **Oversampling**: The minority class is upsampled to match the count of the majority class. 
 
-- **Undersampling**: The instances majority class are reduced to match the count of the minority class. However, remember that undersampling techniques can discard valuable information that might be crucial for training the model.
+- **Undersampling**: The samples of majority class are reduced to match the count of the minority class. However, remember that undersampling techniques can discard valuable information that might be crucial for training the model.
 
 In this notebook, we will use the Adaptive Synthetic Sampling technique to increase the samples of the minority class (preterm birth).
 
@@ -325,13 +325,13 @@ Adaptive Synthetic Sampling is an oversampling technique in which we generate sy
 
 $$d=m_s/m_l$$
 
-where $m_s$ is the number of minority class examples and $m_l$ is the number of majority class example
+where $m_s$ is the number of minority class examples and $m_l$ is the number of majority class examples
 
 - **Calculate the number of synthetic data examples that need to be generated for the minority class:**
 
 $$G=(m_l-m_s)\times\beta$$
 
-where $\beta$ is a parameter used to specify the desired balance level after generation of the synthetic data. $\beta=1$ means a fully balanced data set is created after generalisation process.
+where $\beta$ is a parameter used to specify the desired balance level after generation of the synthetic data. $\beta=1$ means a fully balanced data set is created after generalization process.
 
 
 - For each example $x_i \in minority class$, **find K nearest neighbors based on the Euclidean distance** in n dimensional space, and **calculate the ratio** $r_i$ defined as: 
@@ -341,7 +341,7 @@ $$i= 1, \ldots, m_s$$
 
 where $\Delta_i$ is the number of examples in the K nearest neighbors of $x_i$ that belong to the majority class, therefore $r_i \in [0, 1]$.
 
-- **Normalise $r_i$** according to
+- **Normalize $r_i$** according to
 
 
 $$\hat{r_i}=r_i/\sum_{i=1}^{m_s}r_i$$
@@ -365,7 +365,14 @@ $$g_i = \hat{r_i} \times G$$
 ::: {.cell .markdown}
 ## SVM Classifier Training and Evaluation
 
-In this section, we will train and evaluate the SVM-FG model. The performance of the model will be evaluated using 5-fold cross validation. The following metrics will also be presented: accuracy, error, specificity, sensitivity. The paper doesn't specify the hyperparameters used to train the model. Therefore, we will use `GridSearchCV` to find optimal hyperparameter values for our classifier. We will then report the performance scores obtained by the optimized classifier on the test set. This code cell will also create heatmaps to visualise the performance of the SVM model. It plots the mean validation accuracy obtained for different combinations of hyperparamters C and gamma during GridSearchCV. The x-axis represents different gamma values, and the y-axis represents different C values. 
+In this section, we will train and evaluate the SVM-FG model using 5-fold cross-validation. We'll evaluate the model on the following performance metrics: accuracy, error rate, specificity, and sensitivity. Our process will involve:
+
+- Oversampling the dataset to address class imbalance.
+- For each fold of the 5-fold cross-validation:
+    * Using GridSearchCV to find optimal hyperparameters for the training set.
+    * Plotting validation accuracy for various combinations of gamma and C parameters obtained during GridSearchCV.
+    * Evaluating the optimized classifier on the corresponding test set.
+- Reporting the mean test accuracy, mean specificity, mean sensitivity, mean error rate, along with their standard errors.
 
 :::
 
