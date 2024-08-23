@@ -2,12 +2,12 @@
 
 # Exploring Oversampling on the Income Dataset
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/shaivimalik/medicine_preprocessing-on-entire-dataset/blob/main/notebooks/02.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/shaivimalik/medicine_preprocessing-on-entire-dataset/blob/main/notebooks/Exploring_Oversampling-Adult.ipynb)
 
 :::
 
 ::: {.cell .markdown}
-# Introduction
+## Introduction
 
 This notebook explores the concept of data leakage, its consequences, and prevention methods. We will investigate a specific type of data leakage: **preprocessing on training and test set**. To demonstrate the impact of data leakage, we will use the **Census Income dataset** for income prediction, aiming to determine whether a person makes over 50K a year using a Support Vector Machine (SVM) classifier with RBF kernel. 
 
@@ -36,7 +36,7 @@ Overview of the sections:
 :::
 
 ::: {.cell .markdown}
-# Data Leakage
+## Data Leakage
 
 Data leakage occurs when a model learns to recognise patterns or relationships between the features and target variable during training that don't exist in the real-world data. Since these patterns won’t be present in the real-world data about which the claims are made, models with data leakage errors fail to generalise to unseen data[^1]. Data leakage includes errors such as:
 
@@ -57,7 +57,7 @@ In this notebook, we will discover the consequences of pre-processing on entire 
 :::
 
 ::: {.cell .markdown}
-# Retrieve the dataset
+## Retrieve the dataset
 
 The **Census Income dataset** is a widely used resource for income prediction tasks. It was extracted from the **1994 US Census Bureau database** by Ronny Kohavi and Barry Becker. This dataset provides information on demographic, employment, and income attributes of individuals. In this notebook, we will utilize a subset of 3000 instances from the adult database, obtained from the **UC Irvine Machine Learning Repository**.
 
@@ -110,7 +110,7 @@ from sklearn.metrics import accuracy_score
 ::: {.cell .code}
 ```python
 # Load the adult dataset, specifying column names and limiting to 3000 rows
-adult_data = pd.read_csv('adult.data', names=['age', 'workclass', 'fnlwgt', 'education', 'education-num', 'marital-status', 'occupation', 'relationship',
+adult_data = pd.read_csv('../adult.data', names=['age', 'workclass', 'fnlwgt', 'education', 'education-num', 'marital-status', 'occupation', 'relationship',
                                                'race', 'sex','capital-gain', 'capital-loss', 'hours-per-week', 'native-country','<=50K'], nrows=3000)
 # Display the first few rows of the DataFrame
 adult_data.head()
@@ -165,7 +165,7 @@ X.head()
 :::
 
 ::: {.cell .markdown}
-# SMOTE
+## SMOTE
 
 **Synthetic Minority Over-sampling Technique (SMOTE)** is an oversampling technique in which the minority class is oversampled by creating synthetic samples[^2]. The synthetic samples are generated with the help of k minority class nearest neighbors. The algorithm generates synthetic samples using the following steps:
 
@@ -181,32 +181,42 @@ X.head()
 
     - Add the resultant to the minority class sample to create the synthetic sample
 
+> *Suppose N = 3 (meaning we'll create three synthetic samples for each original minority sample)*
+>
+> *Minority Class Sample: [9, 4, 11]*
+>
+> *4 Minority Class Nearest Neighbors: [11, 2, 13], [10, 5, 12], [8, 3, 11], [12, 3, 13]*
+>
+> *Synthetic Sample 1:*
+>
+> [9, 4, 11] + 0.47 * ([10, 5, 12] - [9, 4, 11])
+>
+> = [9, 4, 11] + 0.47 * [1, 1, 1]
+>
+> = [9, 4, 11] + [0.47, 0.47, 0.47]
+>
+> = [9.47, 4.47, 11.47]
+>
+> *Synthetic Sample 2:*
+>
+> [9, 4, 11] + 0.91 * ([11, 2, 13] - [9, 4, 11])
+>
+> = [9, 4, 11] + 0.91 * [2, -2, 2]
+>
+> = [9, 4, 11] + [1.82, -1.82, 1.82]
+>
+> = [10.82, 2.18, 12.82]
+>
+> *Synthetic Sample 3:*
+>
+> [9, 4, 11] + 0.68 * ([8, 3, 11] - [9, 4, 11])
+>
+> = [9, 4, 11] + 0.68 * [-1, -1, 0]
+>
+> = [9, 4, 11] + [-0.68, -0.68, 0]
+>
+> = [8.32, 3.32, 11]
 
-> _Suppose N = 2 (meaning we'll create two synthetic samples for each original minority sample)_
-> 
-> _Minority Class Sample: [5, 2, 8]_
-> 
-> _5 Minority Class Nearest Neighbors: [4, 3, 7], [6, 1, 9], [5, 3, 8], [4, 2, 7], [6, 2, 9]_
-> 
-> _Synthetic Sample 1:_
-> 
-> [5, 2, 8] + 0.47 * ([6, 1, 9] - [5, 2, 8])
-> 
-> = [5, 2, 8] + 0.47 * [1, -1, 1]
-> 
-> = [5, 2, 8] + [0.47, -0.47, 0.47]
-> 
-> = [5.47, 1.53, 8.47]
-> 
-> _Synthetic Sample 2:_
-> 
-> [5, 2, 8] + 0.91 * ([4, 3, 7] - [5, 2, 8])
-> 
-> = [5, 2, 8] + 0.91 * [-1, 1, -1]
-> 
-> = [5, 2, 8] + [-0.91, 0.91, -0.91]
-> 
-> = [4.09, 2.91, 7.09]
 
 The above example in the form of Python code:
 
@@ -215,12 +225,12 @@ The above example in the form of Python code:
 ::: {.cell .code}
 ```python
 # Number of synthetic samples to generate per minority sample
-N = 2
+N = 3
 
-minority_sample = np.array([5, 2, 8])
+minority_sample = np.array([9, 4, 11])
 
 # K-nearest neighbors of the minority sample
-knn = np.array([[4, 3, 7], [6, 1, 9], [5, 3, 8], [4, 2, 7], [6, 2, 9]])
+knn = np.array([[11, 2, 13], [10, 5, 12], [8, 3, 11], [12, 3, 13]])
 
 # List to store synthetic samples
 syn_samples = []
@@ -228,15 +238,15 @@ syn_samples = []
 for i in range(N):
     # Randomly select one of the k-nearest neighbors
     random_neighbor = knn[np.random.randint(0, knn.shape[0])]
-
+    
     # Calculate the difference between the neighbor and the minority sample
     difference = random_neighbor - minority_sample
-
+    
     # Create synthetic sample
     syn_sample = minority_sample + np.random.random() * difference
-
+    
     print(f"Synthetic Sample {i+1}: {syn_sample}")
-
+    
     # Add the synthetic sample to list
     syn_samples.append(syn_sample)
 
@@ -337,7 +347,7 @@ class SMOTE(object):
 :::
 
 ::: {.cell .markdown}
-# Training SVM - with Data Leakage
+## Training SVM - with Data Leakage
 
 In this section, we scale the entire dataset using `MinMaxScaler` and then oversample it using our implementation of SMOTE. We split the resulting dataset into training and test sets using `ShuffleSplit`. After splitting, Support Vector Machine classifier is trained on the training set. To analyse data leakage, we calculate the number of samples in training set derived from test set samples. We evaluate the model on the test set, and report the accuracy.
 ```mermaid
@@ -406,7 +416,7 @@ print("Accuracy:", leak_results['balanced'])
 :::
 
 ::: {.cell .markdown}
-# Training SVM - without Data Leakage
+## Training SVM - without Data Leakage
 
 In this section, the dataset is split into training and test sets using `ShuffleSplit`. We scale the training set using `MinMaxScaler` and oversample it using our implementation of SMOTE. A Support Vector Machine (SVM) classifier is then trained on the oversampled training data. To analyse data leakage, we calculate the number of samples in training set derived from test set samples. The test set is scaled using the statistics derived from the training set. The SVM model's performance is evaluated on both the original (imbalanced) and oversampled test sets. The accuracy is reported for both test set conditions.
 
@@ -523,7 +533,7 @@ plt.show()
 :::
 
 ::: {.cell .markdown}
-# Discussion
+## Discussion
 
 The results show that the model with data leakage achieved higher accuracy compared to the model without data leakage. To provide a fair comparison, we oversampled the test set in the second case, allowing us to evaluate both models on a balanced set. However, modifying the test set distribution is not recommended in practice, as the test set should reflect the distribution of real-world data. To address this, we also evaluated the model's performance on the original, imbalanced test set, providing a more accurate representation of its expected real-world effectiveness.
 

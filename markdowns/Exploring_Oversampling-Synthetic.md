@@ -2,13 +2,13 @@
 
 # Exploring Oversampling on Synthetic Data
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/shaivimalik/medicine_preprocessing-on-entire-dataset/blob/main/notebooks/03.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/shaivimalik/medicine_preprocessing-on-entire-dataset/blob/main/notebooks/Exploring_Oversampling-Synthetic.ipynb)
 
 :::
 
 ::: {.cell .markdown}
 
-# Introduction
+## Introduction
 
 In this notebook, we will continue our quest to understand data leakage and its consequences. As in the previous notebook, we will explore a specific type of data leakage: **preprocessing on training and test set**. To demonstrate the impact of data leakage, we will create a **Synthetic Dataset for classification** and train a **Support Vector Machine (SVM) classifier with an RBF kernel** to determine the class.
 
@@ -36,7 +36,7 @@ Overview of the sections:
 
 ::: {.cell .markdown}
 
-# Create the dataset 📊
+## Create the dataset 📊
 
 In this section, we will create the dataset using `make_classification` from `scikit-learn` library. The dataset will consist of two-dimensional feature vectors and binary targets. The dataset will be created with an class imbalance, where the ratio between the majority and minority classes will be 4:1.
 
@@ -125,7 +125,7 @@ plt.show()
 
 ::: {.cell .markdown}
 
-# SMOTE
+## SMOTE
 
 **Synthetic Minority Over-sampling Technique (SMOTE)** is an oversampling technique in which the minority class is oversampled by creating synthetic samples[^1]. The synthetic samples are generated with the help of k minority class nearest neighbors. The algorithm generates synthetic samples using the following steps:
 
@@ -141,78 +141,6 @@ plt.show()
 
     - Add the resultant to the minority class sample to create the synthetic sample
 
-
-> *Suppose N = 3 (meaning we'll create three synthetic samples for each original minority sample)*
->
-> *Minority Class Sample: [9, 4, 11]*
->
-> *4 Minority Class Nearest Neighbors: [11, 2, 13], [10, 5, 12], [8, 3, 11], [12, 3, 13]*
->
-> *Synthetic Sample 1:*
->
-> [9, 4, 11] + 0.47 * ([10, 5, 12] - [9, 4, 11])
->
-> = [9, 4, 11] + 0.47 * [1, 1, 1]
->
-> = [9, 4, 11] + [0.47, 0.47, 0.47]
->
-> = [9.47, 4.47, 11.47]
->
-> *Synthetic Sample 2:*
->
-> [9, 4, 11] + 0.91 * ([11, 2, 13] - [9, 4, 11])
->
-> = [9, 4, 11] + 0.91 * [2, -2, 2]
->
-> = [9, 4, 11] + [1.82, -1.82, 1.82]
->
-> = [10.82, 2.18, 12.82]
->
-> *Synthetic Sample 3:*
->
-> [9, 4, 11] + 0.68 * ([8, 3, 11] - [9, 4, 11])
->
-> = [9, 4, 11] + 0.68 * [-1, -1, 0]
->
-> = [9, 4, 11] + [-0.68, -0.68, 0]
->
-> = [8.32, 3.32, 11]
-
-
-The above example in the form of Python code:
-
-:::
-
-::: {.cell .code}
-```python
-# Number of synthetic samples to generate per minority sample
-N = 3
-
-minority_sample = np.array([9, 4, 11])
-
-# K-nearest neighbors of the minority sample
-knn = np.array([[11, 2, 13], [10, 5, 12], [8, 3, 11], [12, 3, 13]])
-
-# List to store synthetic samples
-syn_samples = []
-
-for i in range(N):
-    # Randomly select one of the k-nearest neighbors
-    random_neighbor = knn[np.random.randint(0, knn.shape[0])]
-    
-    # Calculate the difference between the neighbor and the minority sample
-    difference = random_neighbor - minority_sample
-    
-    # Create synthetic sample
-    syn_sample = minority_sample + np.random.random() * difference
-    
-    print(f"Synthetic Sample {i+1}: {syn_sample}")
-    
-    # Add the synthetic sample to list
-    syn_samples.append(syn_sample)
-
-syn_samples = np.array(syn_samples)
-```
 :::
 
 ::: {.cell .markdown}
@@ -308,7 +236,7 @@ class SMOTE(object):
 :::
 
 ::: {.cell .markdown}
-# Training SVM - with Data Leakage 🚨
+## Training SVM - with Data Leakage 🚨
 
 In this section, we oversample the entire dataset using our implementation of SMOTE. We split the resulting dataset into training and test sets using `ShuffleSplit`. After splitting, Support Vector Machine classifier is trained on the training set. To analyse data leakage, we calculate the number of samples in training set derived from test set. We evaluate the model on the test set and newly generated data, and report the accuracy.
 
@@ -638,7 +566,7 @@ print("Percentage of train set derived from test set:",round(train_leak*100/trai
 :::
 
 ::: {.cell .markdown}
-# Training SVM - without Data Leakage ✅
+## Training SVM - without Data Leakage ✅
 
 In this section, the dataset is split into training and test sets using `ShuffleSplit`. We oversample the training set using our implementation of SMOTE. A Support Vector Machine model is then trained on the oversampled training set. To analyse data leakage, we calculate the number of samples in training set derived from test set. We evaluate the performance of the SVM model on the original (imbalanced) test set, the oversampled test set, and newly generated data. We report the accuracy achieved in each case.
 
@@ -770,7 +698,7 @@ plt.show()
 :::
 
 ::: {.cell .markdown}
-# Discussion
+## Discussion
 
 The model with data leakage achieved higher accuracy on the test set than the model without data leakage, confirming that data leakage leads to overly optimistic evaluation of model performance. We have oversampled the test set in the second case to provide fair comparison between the models. However, oversampling the test set is not recommended as the test set should represent the distribution of real-world data. We have also reported the metrics obtained with the original test set to provide correct evaluation of the model.
 
