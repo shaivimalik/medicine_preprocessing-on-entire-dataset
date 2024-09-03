@@ -280,7 +280,7 @@ print("Count of",counts[0][1],":",counts[1][1])
 
 ::: {.cell .markdown}
 
-After oversampling, we split the dataset into training and testing sets using the `ShuffleSplit` from scikit-learn's model_selection module. We use an 80-20 train-test split, which means 80% of the data will be used for training the model, and 20% will be held out for testing. 
+After oversampling, we split the dataset into training and test sets using the `ShuffleSplit` from scikit-learn's model_selection module. We use an 80-20 train-test split, which means 80% of the data will be used for training the model, and 20% will be held out for testing. 
 
 :::
 
@@ -593,7 +593,7 @@ cor_results={'balanced': 0.0, 'new_data': 0.0, 'correct': 0.0}
 # Define a ShuffleSplit object for splitting the dataset
 rs = ShuffleSplit(n_splits=1, test_size=0.2, random_state=30)
 
-# Split the original data into training and testing sets
+# Split the original data into training and test sets
 train_index_cor, test_index_cor = next(rs.split(X))
 X_train_cor, y_train_cor = X[train_index_cor], y[train_index_cor]
 X_test_cor, y_test_cor = X[test_index_cor], y[test_index_cor]

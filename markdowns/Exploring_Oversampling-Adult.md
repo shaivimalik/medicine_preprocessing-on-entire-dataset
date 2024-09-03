@@ -46,7 +46,7 @@ Data leakage occurs when a model learns to recognise patterns or relationships b
 
 - **Duplicates in datasets:** If there are duplicate data points in both the training and test sets, the model can memorize these instances, leading to inflated performance metrics.
 
-- **Pre-processing on training and test set:** If pre-processing is performed on the entire dataset, information about the testing set may leak into the training set. 
+- **Pre-processing on training and test set:** If pre-processing is performed on the entire dataset, information about the test set may leak into the training set. 
 
 - **Model uses features that are not legitimate:** If the model has access to features that should not be legitimately available for use. For example, when information about the target variable is incorporated into the features used for training.
 

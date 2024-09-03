@@ -90,6 +90,8 @@ In this notebook, we will reproduce the model with the highest reported accuracy
 | Specificity   | 97.13           |
 | Sensitivity   | 93.51           |
 
+_Note: We use 5-fold cross-validation instead of 10-fold to ensure sufficient minority samples in each fold for oversampling when following the correct approach without data leakage._
+
 Overview of the sections:
 
 - [Generate Features](#generate-features): We'll discuss the techniques used to extract features from raw EHG signals. We'll also do some exploratory data analysis on the generated features.
@@ -411,7 +413,8 @@ fig, axes = plt.subplots(nrows=1, ncols=5, figsize=(36, 6))
 
 # Loop through the folds of the cross-validation
 for fold, (train_index, test_index) in enumerate(kfold.split(X_oversamp, y_oversamp)):
-    # Split the data into training and testing sets
+
+    # Split the data into training and test sets
     X_train, X_test = X_oversamp[train_index], X_oversamp[test_index]
     y_train, y_test = y_oversamp[train_index], y_oversamp[test_index]
     
@@ -427,14 +430,16 @@ for fold, (train_index, test_index) in enumerate(kfold.split(X_oversamp, y_overs
     axes[fold].set_yticks(np.arange(gamma_range.shape[0]), labels=C_range)
     axes[fold].set_title(f"Validation accuracy fold {fold + 1}")
 
-    # Evaluate the model on the testing set
+    # Evaluate the model on the test set
     y_pred = clf.predict(X_test)
+    
     # Compute metrics
     metrics['accuracy'][fold] = accuracy_score(y_test, y_pred)
     metrics['error'][fold] = 1 - accuracy_score(y_test, y_pred)
     metrics['sensitivity'][fold] = recall_score(y_test, y_pred)
     metrics['specificity'][fold] = recall_score(y_test, y_pred, pos_label=0)
 
+# Display the heatmaps
 fig.show()
 
 # Create a DataFrame from the performance metrics
