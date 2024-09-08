@@ -6,19 +6,19 @@ In this sequence of notebooks, we will reproduce the results from
 
 which predicts pre-term birth based on raw EHG signals from pregnant women. It claims an accuracy of 95.5% on the test set using an SVM classifier with RBF kernel. We achieve a similar high accuracy (97%) by following the steps in that paper:
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/shaivimalik/medicine_preprocessing-on-entire-dataset/blob/main/notebooks/01.ipynb) Reproducing "Characterization of Term and Preterm Deliveries using Electrohysterograms Signatures"
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/shaivimalik/medicine_preprocessing-on-entire-dataset/blob/main/notebooks/Reproducing_Original_Result.ipynb) Reproducing "Characterization of Term and Preterm Deliveries using Electrohysterograms Signatures"
 
 However, it turns out (as discussed in [2]) that the reported 95.5% accuracy is much higher than we would achieve on *new* EHG signals when the model is used in practice. This is because we oversampled the dataset before splitting it into training and test sets. Consequently, test set samples were used to generate synthetic samples for the training set and training set samples were used to generate synthetic samples for the test set.
 
 We explore this issue further in the following examples - 
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/shaivimalik/medicine_preprocessing-on-entire-dataset/blob/main/notebooks/02.ipynb) Exploring Oversampling on the Income Dataset
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/shaivimalik/medicine_preprocessing-on-entire-dataset/blob/main/notebooks/Exploring_Oversampling-Adult.ipynb) Exploring Oversampling on the Income Dataset
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/shaivimalik/medicine_preprocessing-on-entire-dataset/blob/main/notebooks/03.ipynb) Exploring Oversampling on Synthetic Data
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/shaivimalik/medicine_preprocessing-on-entire-dataset/blob/main/notebooks/Exploring_Oversampling-Synthetic.ipynb) Exploring Oversampling on Synthetic Data
  
 Finally, we repeat the original pre-term birth prediction, but without the data leakage error - we keep training and test sets separate in oversampling, rather than oversampling all together. We show that the original accuracy was based on an "overly optimistic" evaluation, and the true performance of the model is much less.
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/shaivimalik/medicine_preprocessing-on-entire-dataset/blob/main/notebooks/04.ipynb) "Characterization of Term and Preterm Deliveries using Electrohysterograms Signatures" Without Data Leakage
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/shaivimalik/medicine_preprocessing-on-entire-dataset/blob/main/notebooks/Correcting_Original_Result.ipynb) "Characterization of Term and Preterm Deliveries using Electrohysterograms Signatures" Without Data Leakage
 
 ---
 
