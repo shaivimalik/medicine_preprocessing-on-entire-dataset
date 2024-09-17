@@ -90,7 +90,7 @@ In this notebook, we will reproduce the model with the highest reported accuracy
 | Specificity   | 97.13           |
 | Sensitivity   | 93.51           |
 
-_Note: We use 5-fold cross-validation instead of 10-fold to ensure sufficient minority samples in each fold for oversampling when following the correct approach without data leakage._
+_Note: We use 3-fold cross-validation instead of 10-fold to ensure sufficient minority samples in each fold for oversampling when following the correct approach without data leakage._
 
 Overview of the sections:
 
@@ -98,7 +98,7 @@ Overview of the sections:
 
 - [Addressing Class Imbalance](#addressing-class-imbalance): We'll discuss the ADASYN oversampling technique and its role in balancing the dataset.
 
-- [SVM Classifier Training and Evaluation](#svm-classifier-training-and-evaluation): We'll implement the process of training the SVM (Support Vector Machine) model with the extracted features and its evaluation using 5-fold cross-validation.
+- [SVM Classifier Training and Evaluation](#svm-classifier-training-and-evaluation): We'll implement the process of training the SVM (Support Vector Machine) model with the extracted features and its evaluation using 3-fold cross-validation.
 
 - [Discussion](#discussion): Finally, we'll present and interpret the results obtained from the model.
 
@@ -149,7 +149,7 @@ import matplotlib.pyplot as plt
 from imblearn.over_sampling import ADASYN
 from sklearn.svm import SVC
 from sklearn.model_selection import GridSearchCV, StratifiedKFold
-from sklearn.metrics import accuracy_score, recall_score
+from sklearn.metrics import RocCurveDisplay, accuracy_score, recall_score, auc
 ```
 ::: 
 
@@ -373,16 +373,16 @@ where $m_s$ is the number of minority class examples and $m_l$ is the number of 
 ::: {.cell .markdown}
 ## SVM Classifier Training and Evaluation
 
-In this section, we will train and evaluate the SVM-FG model using 5-fold cross-validation. We'll evaluate the model on the following performance metrics: accuracy, error rate, specificity, and sensitivity. Our process will involve:
+In this section, we will train and evaluate the SVM-FG model using 3-fold cross-validation. We'll evaluate the model on the following performance metrics: accuracy, error rate, specificity, and sensitivity. Our process will involve:
 
 - Oversampling the dataset to address class imbalance.
-- For each fold of the 5-fold cross-validation:
+- For each fold of the 3-fold cross-validation:
     * Using `GridSearchCV` to find optimal hyperparameters for the training set.
     * Plotting validation accuracy for various combinations of gamma and C parameters obtained during `GridSearchCV`.
     * Evaluating the optimized classifier on the corresponding test set.
 - Reporting the mean test accuracy, mean specificity, mean sensitivity, mean error rate, along with their standard errors.
 
-_Note: `StratifiedKFold` is used to implement 5-fold cross-validation to ensure an equal number of minority samples in each fold. This is important due to the small number of minority samples in the dataset. If we don't use `StratifiedKFold`, we might end up with folds made up entirely of majority samples._
+_Note: `StratifiedKFold` is used to implement 3-fold cross-validation to ensure an equal number of minority samples in each fold. This is important due to the small number of minority samples in the dataset. If we don't use `StratifiedKFold`, we might end up with folds made up entirely of majority samples._
 
 :::
 
@@ -392,9 +392,9 @@ _Note: `StratifiedKFold` is used to implement 5-fold cross-validation to ensure 
 
 # Oversample the dataset using ADASYN
 oversampler = ADASYN(n_neighbors=5, random_state=15)
-X_oversamp,y_oversamp = oversampler.fit_resample(X.to_numpy(), y.to_numpy().reshape(-1))
+X_oversamp, y_oversamp = oversampler.fit_resample(X.to_numpy(), y.to_numpy().reshape(-1))
 
-kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=15)
+kfold = StratifiedKFold(n_splits=3, shuffle=True, random_state=15)
 
 # Define the parameter grid for GridSearchCV
 gamma_range = np.logspace(start=-5, stop=5, num=11, base=10)
@@ -403,13 +403,19 @@ param_grid = {'C': C_range, 'gamma': gamma_range}
 
 # Create SVC and GridSearchCV
 svc = SVC(kernel='rbf', random_state=15)
-clf = GridSearchCV(svc, param_grid, cv=10, scoring='accuracy')
+clf = GridSearchCV(svc, param_grid, cv=3, scoring='accuracy')
 
 # Dictionary to store performance metrics
-metrics = {'accuracy': np.zeros(5), 'error': np.zeros(5), 'specificity': np.zeros(5), 'sensitivity': np.zeros(5)}
+metrics = {'accuracy': np.zeros(kfold.get_n_splits()), 'error': np.zeros(kfold.get_n_splits()), 'specificity': np.zeros(kfold.get_n_splits()), 'sensitivity': np.zeros(kfold.get_n_splits())}
 
 # Create figure to plot heatmaps
-fig, axes = plt.subplots(nrows=1, ncols=5, figsize=(36, 6))
+fig_heatmap, axes = plt.subplots(nrows=1, ncols=kfold.get_n_splits(), figsize=(36, 6))
+
+# Create figure to plot ROC curve
+tprs = []
+aucs = []
+mean_fpr = np.linspace(0, 1, 100)
+fig, ax = plt.subplots(figsize=(6, 6))
 
 # Loop through the folds of the cross-validation
 for fold, (train_index, test_index) in enumerate(kfold.split(X_oversamp, y_oversamp)):
@@ -423,7 +429,7 @@ for fold, (train_index, test_index) in enumerate(kfold.split(X_oversamp, y_overs
 
     # Plot the grid search results
     scores = clf.cv_results_["mean_test_score"].reshape(C_range.shape[0], gamma_range.shape[0])
-    im = axes[fold].imshow(scores, interpolation="nearest", cmap='viridis', vmin=0.0, vmax=1.0)
+    im = axes[fold].imshow(scores, interpolation="nearest", cmap='Blues', vmin=0.0, vmax=1.0)
     axes[fold].set_xlabel("gamma")
     axes[fold].set_ylabel("C")
     axes[fold].set_xticks(np.arange(gamma_range.shape[0]), labels=gamma_range, rotation=45)
@@ -439,8 +445,56 @@ for fold, (train_index, test_index) in enumerate(kfold.split(X_oversamp, y_overs
     metrics['sensitivity'][fold] = recall_score(y_test, y_pred)
     metrics['specificity'][fold] = recall_score(y_test, y_pred, pos_label=0)
 
+    # Plot ROC 
+    viz = RocCurveDisplay.from_estimator(
+        clf,
+        X_test,
+        y_test,
+        name=f"ROC fold {fold}",
+        alpha=0.3,
+        lw=1,
+        ax=ax,
+        plot_chance_level=(fold == kfold.get_n_splits() - 1),
+    )
+    interp_tpr = np.interp(mean_fpr, viz.fpr, viz.tpr)
+    interp_tpr[0] = 0.0
+    tprs.append(interp_tpr)
+    aucs.append(viz.roc_auc)
+
 # Display the heatmaps
-fig.show()
+fig_heatmap.show()
+
+# Display ROC
+mean_tpr = np.mean(tprs, axis=0)
+mean_tpr[-1] = 1.0
+mean_auc = auc(mean_fpr, mean_tpr)
+std_auc = np.std(aucs)
+ax.plot(
+    mean_fpr,
+    mean_tpr,
+    color="b",
+    label=r"Mean ROC (AUC = %0.2f $\pm$ %0.2f)" % (mean_auc, std_auc),
+    lw=2,
+    alpha=0.8,
+)
+std_tpr = np.std(tprs, axis=0)
+tprs_upper = np.minimum(mean_tpr + std_tpr, 1)
+tprs_lower = np.maximum(mean_tpr - std_tpr, 0)
+ax.fill_between(
+    mean_fpr,
+    tprs_lower,
+    tprs_upper,
+    color="grey",
+    alpha=0.2,
+    label=r"$\pm$ 1 std. dev.",
+)
+ax.set(
+    xlabel="False Positive Rate",
+    ylabel="True Positive Rate",
+    title=f"Mean ROC curve with variability\n(Positive label 'term-birth')",
+)
+ax.legend(loc="lower right")
+plt.show()
 
 # Create a DataFrame from the performance metrics
 metrics_df = pd.DataFrame(metrics)
@@ -461,10 +515,10 @@ In this notebook, we have successfully reproduced the results published in Chara
 
 | Metric        | Reproduced Results | Original Results|
 |:-------------:|:------------------:|:---------------:|
-| Accuracy      | 97.12 ± 0.74       | 95.5            |
-| Error         | 2.88 ± 0.74        | 4.48            |      
-| Specificity   | 99.62 ± 0.38       | 97.13           |
-| Sensitivity   | 94.62 ± 1.41       | 93.51           |
+| Accuracy      | 96.97 ± 0.83       | 95.5            |
+| Error         | 3.03 ± 0.83        | 4.48            |      
+| Specificity   | 99.63 ± 0.37       | 97.13           |
+| Sensitivity   | 94.23 ± 1.33       | 93.51           |
 
 As shown in the table above, the SVM classifier achieves high accuracy on the TPEHG dataset. However, the methodology used in this study suffers from a flaw: data leakage arising from oversampling the entire dataset. Applying oversampling to the entire dataset before splitting it into training and test sets introduces data leakage. This occurs because information from test cases is leaked into the training set, leading to inflated performance scores. To learn more about data leakage, proceed to the next notebook.
 
