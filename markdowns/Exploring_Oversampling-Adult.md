@@ -474,7 +474,7 @@ print("Number of samples in training set derived from test set:", leak)
 print("Percentage of training set derived from test set:", leak*100/len(train_index), "%")
 
 # Create and train SVM classifier on the oversampled training data
-svm = SVC(kernel='rbf', C=10.0, gamma=1000.0, random_state=20)
+svm = SVC(kernel='rbf', C=0.01, gamma=100, random_state=20)
 svm.fit(X_train_oversamp, y_train_oversamp)
 
 print("\n--- Evaluation with Oversampled Test Set (Not Recommended) ---")
@@ -539,7 +539,7 @@ The results show that the model with data leakage achieved higher accuracy compa
 
 | Metric        | With Data Leakage | Without Data Leakage (oversampled test set) | Without Data Leakage (original test set) |
 |:-------------:|:-----------------:|:-------------------------------------------:|:----------------------------------------:|
-| Accuracy      | 81.43             | 61.17                                       | 72.5                                     |
+| Accuracy      | 81.43             | 58.19                                       | 72.83                                    |
 
 As evident from the table, data leakage from the test set to the training set has led to an overly optimistic measure of the model's performance. In practice, the performance differences due to data leakage can be even more significant.
 
