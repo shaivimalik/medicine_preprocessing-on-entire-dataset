@@ -38,7 +38,7 @@ Overview of the sections:
 ::: {.cell .markdown}
 ## Data Leakage
 
-Data leakage occurs when a model learns to recognise patterns or relationships between the features and target variable during training that don't exist in the real-world data. Since these patterns won’t be present in the real-world data about which the claims are made, models with data leakage errors fail to generalise to unseen data[^1]. Data leakage includes errors such as:
+Data leakage occurs when a model learns to recognise patterns or relationships between the features and target variable during training that don't exist in the real-world data. Since these patterns won’t be present in the real-world data about which the claims are made, models with data leakage errors fail to generalise to unseen data [^1]. Data leakage includes errors such as:
 
 - **No test set:** If the model is trained and tested on the same data, it will perform exceptionally well on the test set, but it will fail on unseen data.
 
@@ -50,7 +50,7 @@ Data leakage occurs when a model learns to recognise patterns or relationships b
 
 - **Model uses features that are not legitimate:** If the model has access to features that should not be legitimately available for use. For example, when information about the target variable is incorporated into the features used for training.
 
-Data leakage leads to overly optimistic estimates of model performance. It is also identified as the major cause behind the reproducibility crisis in ML-Based science[^3].
+Data leakage leads to overly optimistic estimates of model performance. It is also identified as the major cause behind the reproducibility crisis in ML-Based science [^3].
 
 In this notebook, we will discover the consequences of pre-processing on entire dataset, specifically oversampling, on model performance.
 
@@ -167,7 +167,7 @@ X.head()
 ::: {.cell .markdown}
 ## SMOTE
 
-**Synthetic Minority Over-sampling Technique (SMOTE)** is an oversampling technique in which the minority class is oversampled by creating synthetic samples[^2]. The synthetic samples are generated with the help of k minority class nearest neighbors. The algorithm generates synthetic samples using the following steps:
+**Synthetic Minority Over-sampling Technique (SMOTE)** is an oversampling technique in which the minority class is oversampled by creating synthetic samples [^2]. The synthetic samples are generated with the help of k minority class nearest neighbors. The algorithm generates synthetic samples using the following steps:
 
 - For each minority class sample perform the steps N times, where N is the desired oversampling ratio:
 

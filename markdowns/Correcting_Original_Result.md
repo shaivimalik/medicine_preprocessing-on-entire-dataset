@@ -460,9 +460,9 @@ In our final approach, we demonstrate that the above implementation can be achie
 
 ::: {.cell .code}
 ```python
-eval_metrics = {"accuracy":"accuracy", "balanced_accuracy": "balanced_accuracy", "sensitivity": "recall", "precision": "precision", 
-                "specificity": make_scorer(recall_score, pos_label=0), "f1_score (preterm birth)": make_scorer(f1_score, pos_label=0), 
-                "negative_predictive_value": make_scorer(precision_score, pos_label=0, zero_division=0.0)}
+eval_metrics = {"accuracy":"accuracy", "balanced_accuracy": "balanced_accuracy", "specificity": make_scorer(recall_score, pos_label=0), 
+                "sensitivity": "recall", "precision": "precision", "negative_predictive_value": make_scorer(precision_score, pos_label=0, zero_division=0.0), 
+                "f1_score (preterm birth)": make_scorer(f1_score, pos_label=0)}
 ```
 :::
 
@@ -479,30 +479,24 @@ pipe = imblearn.pipeline.Pipeline([
         ('SVM', SVC(kernel='rbf', random_state=5))
     ])
 
+# Define number of splits for StratifiedKFold
+K=3
+
 # Define GridSearchCV
-clf = GridSearchCV(pipe, param_grid, cv=StratifiedKFold(n_splits=3, shuffle=True, random_state=15), scoring='accuracy')
+clf = GridSearchCV(pipe, param_grid, cv=StratifiedKFold(n_splits=K, shuffle=True, random_state=15), scoring='accuracy')
 
 # Perform cross-validation
-cv_results_acc = cross_validate(clf, X.to_numpy(), y.to_numpy(), scoring=eval_metrics, cv=StratifiedKFold(n_splits=3, shuffle=True, random_state=15))
+cv_results_acc = cross_validate(clf, X.to_numpy(), y.to_numpy(), scoring=eval_metrics, cv=StratifiedKFold(n_splits=K, shuffle=True, random_state=15))
+
+# Create a DataFrame from the performance metrics
+cv_acc_df = pd.DataFrame(cv_results_acc)
 
 # Average performance on the test set
-print("Performance on test set:")
-print("Accuracy:", cv_results_acc['test_accuracy'].mean())
-print("Balanced Accuracy:", cv_results_acc['test_balanced_accuracy'].mean())
-print("Specificity:", cv_results_acc['test_specificity'].mean())
-print("Sensitivity:", cv_results_acc['test_sensitivity'].mean())
-print("Precision:", cv_results_acc['test_precision'].mean())
-print("Negative Predictive Value:", cv_results_acc['test_negative_predictive_value'].mean())
-print("F1-score (preterm birth):", cv_results_acc['test_f1_score (preterm birth)'].mean())
+print("Average performance on test set:")
+print(cv_acc_df.mean())
 # Standard error of the performance metrics
 print("Standard error:")
-print("Accuracy:", cv_results_acc['test_accuracy'].std()/cv_results_acc['test_accuracy'].shape[0])
-print("Balanced Accuracy:", cv_results_acc['test_balanced_accuracy'].std()/cv_results_acc['test_balanced_accuracy'].shape[0])
-print("Specificity:", cv_results_acc['test_specificity'].std()/cv_results_acc['test_specificity'].shape[0])
-print("Sensitivity:", cv_results_acc['test_sensitivity'].std()/cv_results_acc['test_sensitivity'].shape[0])
-print("Precision:", cv_results_acc['test_precision'].std()/cv_results_acc['test_precision'].shape[0])
-print("Negative Predictive Value:", cv_results_acc['test_negative_predictive_value'].std()/cv_results_acc['test_negative_predictive_value'].shape[0])
-print("F1-score (preterm birth):", cv_results_acc['test_f1_score (preterm birth)'].std()/cv_results_acc['test_f1_score (preterm birth)'].shape[0])
+print(cv_acc_df.std() / np.sqrt(K))
 ```
 :::
 
@@ -527,30 +521,24 @@ pipe = imblearn.pipeline.Pipeline([
         ('SVM', SVC(kernel='rbf', random_state=5))
     ])
 
+# Define number of splits for StratifiedKFold
+K=3
+
 # Define GridSearchCV
-clf = GridSearchCV(pipe, param_grid, cv=StratifiedKFold(n_splits=3, shuffle=True, random_state=15), scoring='balanced_accuracy')
+clf = GridSearchCV(pipe, param_grid, cv=StratifiedKFold(n_splits=K, shuffle=True, random_state=15), scoring='balanced_accuracy')
 
 # Perform cross-validation
-cv_results_balanced_acc = cross_validate(clf, X.to_numpy(), y.to_numpy(), scoring=eval_metrics, cv=StratifiedKFold(n_splits=3, shuffle=True, random_state=15))
+cv_results_balanced_acc = cross_validate(clf, X.to_numpy(), y.to_numpy(), scoring=eval_metrics, cv=StratifiedKFold(n_splits=K, shuffle=True, random_state=15))
+
+# Create a DataFrame from the performance metrics
+cv_bal_acc_df = pd.DataFrame(cv_results_balanced_acc)
 
 # Average performance on the test set
-print("Performance on test set:")
-print("Accuracy:", cv_results_balanced_acc['test_accuracy'].mean())
-print("Balanced Accuracy:", cv_results_balanced_acc['test_balanced_accuracy'].mean())
-print("Specificity:", cv_results_balanced_acc['test_specificity'].mean())
-print("Sensitivity:", cv_results_balanced_acc['test_sensitivity'].mean())
-print("Precision:", cv_results_balanced_acc['test_precision'].mean())
-print("Negative Predictive Value:", cv_results_balanced_acc['test_negative_predictive_value'].mean())
-print("F1-score (preterm birth):", cv_results_balanced_acc['test_f1_score (preterm birth)'].mean())
+print("Average performance on test set:")
+print(cv_bal_acc_df.mean())
 # Standard error of the performance metrics
 print("Standard error:")
-print("Accuracy:", cv_results_balanced_acc['test_accuracy'].std()/cv_results_balanced_acc['test_accuracy'].shape[0])
-print("Balanced Accuracy:", cv_results_balanced_acc['test_balanced_accuracy'].std()/cv_results_balanced_acc['test_balanced_accuracy'].shape[0])
-print("Specificity:", cv_results_balanced_acc['test_specificity'].std()/cv_results_balanced_acc['test_specificity'].shape[0])
-print("Sensitivity:", cv_results_balanced_acc['test_sensitivity'].std()/cv_results_balanced_acc['test_sensitivity'].shape[0])
-print("Precision:", cv_results_balanced_acc['test_precision'].std()/cv_results_balanced_acc['test_precision'].shape[0])
-print("Negative Predictive Value:", cv_results_balanced_acc['test_negative_predictive_value'].std()/cv_results_balanced_acc['test_negative_predictive_value'].shape[0])
-print("F1-score (preterm birth):", cv_results_balanced_acc['test_f1_score (preterm birth)'].std()/cv_results_balanced_acc['test_f1_score (preterm birth)'].shape[0])
+print(cv_bal_acc_df.std() / np.sqrt(K))
 ```
 :::
 
@@ -573,30 +561,24 @@ pipe = imblearn.pipeline.Pipeline([
         ('SVM', SVC(kernel='rbf', random_state=5))
     ])
 
+# Define number of splits for StratifiedKFold
+K=3
+
 # Define GridSearchCV
-clf = GridSearchCV(pipe, param_grid, cv=StratifiedKFold(n_splits=3, shuffle=True, random_state=15), scoring=make_scorer(recall_score, pos_label=0))
+clf = GridSearchCV(pipe, param_grid, cv=StratifiedKFold(n_splits=K, shuffle=True, random_state=15), scoring=make_scorer(recall_score, pos_label=0))
 
 # Perform cross-validation
-cv_results_specificity = cross_validate(clf, X.to_numpy(), y.to_numpy(), scoring=eval_metrics, cv=StratifiedKFold(n_splits=3, shuffle=True, random_state=15))
+cv_results_specificity = cross_validate(clf, X.to_numpy(), y.to_numpy(), scoring=eval_metrics, cv=StratifiedKFold(n_splits=K, shuffle=True, random_state=15))
+
+# Create a DataFrame from the performance metrics
+cv_specificity_df = pd.DataFrame(cv_results_specificity)
 
 # Average performance on the test set
-print("Performance on test set:")
-print("Accuracy:", cv_results_specificity['test_accuracy'].mean())
-print("Balanced Accuracy:", cv_results_specificity['test_balanced_accuracy'].mean())
-print("Specificity:", cv_results_specificity['test_specificity'].mean())
-print("Sensitivity:", cv_results_specificity['test_sensitivity'].mean())
-print("Precision:", cv_results_specificity['test_precision'].mean())
-print("Negative Predictive Value:", cv_results_specificity['test_negative_predictive_value'].mean())
-print("F1-score (preterm birth):", cv_results_specificity['test_f1_score (preterm birth)'].mean())
+print("Average performance on test set:")
+print(cv_specificity_df.mean())
 # Standard error of the performance metrics
 print("Standard error:")
-print("Accuracy:", cv_results_specificity['test_accuracy'].std()/cv_results_specificity['test_accuracy'].shape[0])
-print("Balanced Accuracy:", cv_results_specificity['test_balanced_accuracy'].std()/cv_results_specificity['test_balanced_accuracy'].shape[0])
-print("Specificity:", cv_results_specificity['test_specificity'].std()/cv_results_specificity['test_specificity'].shape[0])
-print("Sensitivity:", cv_results_specificity['test_sensitivity'].std()/cv_results_specificity['test_sensitivity'].shape[0])
-print("Precision:", cv_results_specificity['test_precision'].std()/cv_results_specificity['test_precision'].shape[0])
-print("Negative Predictive Value:", cv_results_specificity['test_negative_predictive_value'].std()/cv_results_specificity['test_negative_predictive_value'].shape[0])
-print("F1-score (preterm birth):", cv_results_specificity['test_f1_score (preterm birth)'].std()/cv_results_specificity['test_f1_score (preterm birth)'].shape[0])
+print(cv_specificity_df.std() / np.sqrt(K))
 ```
 :::
 
