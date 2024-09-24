@@ -590,36 +590,53 @@ In this cell, we create a barplot to visualise our results.
 
 ::: {.cell .code}
 ```python
-results = [metrics_acc, cv_results_acc, cv_results_balanced_acc, cv_results_specificity]
-labels = ['Grid Search Metric - Accuracy (Oversampled Test Set)', 'Grid Search Metric - Accuracy (Unprocessed Test Set)', 
-              'Grid Search Metric - Balanced Accuracy (Unprocessed Test Set)', 'Grid Search Metric - Specificity (Unprocessed Test Set)'] 
+labels = ['Grid Search Metric - Accuracy (Oversampled Test Set)',
+          'Grid Search Metric - Accuracy (Unprocessed Test Set)',
+          'Grid Search Metric - Balanced Accuracy (Unprocessed Test Set)',
+          'Grid Search Metric - Specificity (Unprocessed Test Set)']
+metrics = ['test_accuracy', 'test_balanced_accuracy', 'test_sensitivity', 'test_precision']
+titles = ['Test Accuracy', 'Test Balanced Accuracy', 'Test Sensitivity', 'Test Precision']
+colors = ['red', 'dodgerblue', 'deepskyblue', 'lightskyblue']
 
-# Get the keys 
-keys = ['test_accuracy', 'test_balanced_accuracy', 'test_sensitivity', 'test_precision', 'test_specificity', 'test_f1_score (preterm birth)', 'test_negative_predictive_value']
+# Create a 2x2 grid of subplots
+fig, axs = plt.subplots(2, 2, figsize=(10, 10))
 
-# Set up the plot
-fig, ax = plt.subplots(figsize=(12, 6))
+# Iterate over metrics and titles to create each subplot
+for i, (metric, title) in enumerate(zip(metrics, titles)):
 
-# Set width of each bar and positions of the bars
-bar_width = 0.2
-r = np.arange(len(keys))
+    # Calculate row and column index for current subplot
+    row, col = divmod(i, 2)
+    
+    # Retrieve data
+    data = [np.mean(metrics_acc[metric]),
+            np.mean(cv_results_acc[metric]),
+            np.mean(cv_results_balanced_acc[metric]),
+            np.mean(cv_results_specificity[metric])]
+    
+    # Create bar plot for current subplot
+    bars_plot = axs[row, col].bar([-1, 1, 2, 3], data, color=colors)
+    # Set title and y-label
+    axs[row, col].set_title(title)
+    axs[row, col].set_ylabel(title.split()[-1])
+    # Set y-axis limit and remove x-axis ticks
+    axs[row, col].set_ylim(0.0, 1.0)
+    axs[row, col].set_xticks([])
 
-# Plot bars
-for i, d in enumerate(results):
-    values = [np.mean(d[key]) for key in keys]
-    ax.bar(r + i*bar_width, values, width=bar_width, label=labels[i])
-
-ax.set_xlabel('Metrics')
-ax.set_ylabel('Mean Values')
-ax.set_title('Comparison of Metric Values')
-ax.set_xticks(r + bar_width * 1.5)
-ax.set_xticklabels(keys, rotation=45, ha='right')
-ax.legend(loc='upper right', fontsize = 7)
+# Add legend
+fig.legend(bars_plot, labels, ncol=2, loc='upper center')
 
 # Display the plot
-plt.tight_layout()
 plt.show()
 ```
+:::
+
+::: {.cell .markdown}
+
+*Food for thought:*
+
+- *Which model would you use to predict preterm birth?*
+- *Are there any other metrics which should be considered?* 
+
 :::
 
 ::: {.cell .markdown}
