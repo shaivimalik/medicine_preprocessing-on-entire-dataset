@@ -23,6 +23,11 @@ In the preceding notebooks, we demonstrated the impact of data leakage on a mode
 # Uncomment the following lines if running on Google Colab
 #!git clone https://github.com/shaivimalik/medicine_preprocessing-on-entire-dataset.git
 #!pip install -r medicine_preprocessing-on-entire-dataset/requirements.txt
+```
+:::
+
+::: {.cell .code}
+```python
 #%cd medicine_preprocessing-on-entire-dataset/notebooks
 ```
 :::

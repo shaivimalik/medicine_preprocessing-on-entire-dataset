@@ -450,12 +450,12 @@ ax20.set_ylabel("Feature-2")
 # Plot original samples in test set
 ax21.scatter(X_test[~np.isin(test_index, test_index[test_syn]), 0], 
              X_test[~np.isin(test_index, test_index[test_syn]), 1], 
-             c=['tab:green' if label == 0.0 else 'tab:red' for label in y_test[~np.isin(test_index, test_index[test_syn])]], 
+             c=['tab:green' if label == 0.0 else 'tab:blue' for label in y_test[~np.isin(test_index, test_index[test_syn])]], 
              edgecolor='none')
 # Plot synthetic samples in test set
 ax21.scatter(X_oversamp[test_index[test_syn], 0], X_oversamp[test_index[test_syn], 1], 
              facecolor='none', 
-             edgecolor=['tab:green' if label == 0.0 else 'tab:red' for label in y_oversamp[test_index[test_syn]]])
+             edgecolor=['tab:green' if label == 0.0 else 'tab:blue' for label in y_oversamp[test_index[test_syn]]])
 ax21.set_xlim(-3, 2)
 ax21.set_ylim(-3.5, 3)
 ax21.set_title("Test Set")
